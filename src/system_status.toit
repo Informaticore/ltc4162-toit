@@ -2,14 +2,14 @@ import .utils
 
 class SystemStatus:
 
-  static BIT_INTVCC_GT_2P8V   ::= 7
-  static BIT_VIN_GT_4P2V      ::= 6
-  static BIT_VIN_GT_VBAT      ::= 5
-  static BIT_VIN_GT_OVLO      ::= 4
-  static BIT_THERMAL_SHUTDOWN ::= 3
-  static BIT_NO_RT            ::= 2
-  static BIT_CELL_COUNT_ERROR ::= 1
-  static BIT_EN_CHG           ::= 0
+  static BIT_INTVCC_GT_2P8V   ::= 0
+  static BIT_VIN_GT_4P2V      ::= 1
+  static BIT_VIN_GT_VBAT      ::= 2
+  static BIT_VIN_GT_OVLO      ::= 3
+  static BIT_THERMAL_SHUTDOWN ::= 4
+  static BIT_NO_RT            ::= 5
+  static BIT_CELL_COUNT_ERROR ::= 7
+  static BIT_EN_CHG           ::= 8
 
   system_status := 0
 
