@@ -1,0 +1,7 @@
+prefixes:
+  test_utils: ..
+  utils: ..
+  config: ..
+packages:
+  ..:
+    path: ..
