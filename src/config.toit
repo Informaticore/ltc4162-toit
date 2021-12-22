@@ -2,11 +2,11 @@ import .utils
 import serial
 
 class Config:
-  static BIT_SUSPEND_CHARGER    ::= 2
-  static BIT_RUN_BSR            ::= 3
-  static BIT_TELEMETRY_SPEED    ::= 4
-  static BIT_FORCE_TELEMETRY_ON ::= 5
-  static BIT_MPPT_ENABLED       ::= 6
+  static BIT_SUSPEND_CHARGER    ::= 5
+  static BIT_RUN_BSR            ::= 4
+  static BIT_TELEMETRY_SPEED    ::= 3
+  static BIT_FORCE_TELEMETRY_ON ::= 2
+  static BIT_MPPT_ENABLED       ::= 1
 
   config/int := 0
 
