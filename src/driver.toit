@@ -20,8 +20,8 @@ class LTC4162:
   static ADCGAIN ::= 18191.0
   static VINDIV ::= 30.0
   static VBATDIV ::= 3.5
-  static RSNSB ::= 68
-  static RSNSI ::= 68
+  static RSNSB ::= 0.068
+  static RSNSI ::= 0.068
   static AVPROG ::= 37.5
   static AVCLPROG ::= 37.5
   static VOUTDIV ::= 30.07
@@ -48,7 +48,10 @@ class LTC4162:
   */
   ibat -> string:
     value := registers_.read_u16_le REG_IBAT
-    ibat := (((1.466/LSB)/RSNSB*value)).stringify 3
+    debug "ibat register value: $value"
+    ad_sensitivity := 1/(ADCGAIN*RSNSB*AVPROG)
+    debug "ad_sensitivity: $ad_sensitivity"
+    ibat := (ad_sensitivity * value).stringify 3
     debug "ibat reg: $value calculates to: $ibat A"
     return ibat
 
@@ -66,7 +69,10 @@ class LTC4162:
   */
   iin -> string:
     value := registers_.read_u16_le REG_IIN
-    iin := (((1.466/LSB)/RSNSI*value)).stringify 3
+    debug "iin register value: $value"
+    ad_sensitivity := 1/(ADCGAIN*RSNSI*AVPROG)
+    debug "ad_sensitivity: $ad_sensitivity"
+    iin := (ad_sensitivity * value).stringify 3
     debug "iin reg: $value calculates to: $iin A"
     return iin
   
@@ -84,8 +90,8 @@ class LTC4162:
   */
   temp -> string:
     reg := registers_.read_u16_le REG_DIE_TEMP
-    temp := (reg * 0.0215/1 - TEMP_OFFSET).stringify 2
-    debug "temp reg: $reg calculates to: $temp V"
+    temp := (reg * 0.0215 - TEMP_OFFSET).stringify 2
+    debug "temp reg: $reg calculates to: $temp C°"
     return temp
 
   /**
