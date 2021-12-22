@@ -33,6 +33,9 @@ class LTC4162:
   constructor device/serial.Device:
     registers_ = device.registers
 
+  /**
+    Returns the VBAT (battery volatage) value as %.2f string
+  */
   vbat -> string:
     cell_count := 1
     value := registers_.read_u16_le REG_VBAT_
@@ -40,36 +43,54 @@ class LTC4162:
     debug "vbat reg: $value calculates to: $vbat"
     return vbat
 
+  /**
+    Returns the IBAT (battery current) value as %.2f string
+  */
   ibat -> string:
     value := registers_.read_u16_le REG_IBAT
     ibat := (((1.466/LSB)/RSNSB*value)).stringify 3
     debug "ibat reg: $value calculates to: $ibat A"
     return ibat
 
+  /**
+    Returns the VIN (voltage input) value as %.2f string
+  */
   vin -> string:
     value := registers_.read_u16_le REG_VIN
     vin := ((VINDIV/ADCGAIN) * value).stringify 2
     debug "vin reg: $value calculates to: $vin"
     return vin
 
+  /**
+    Returns the IIN (input current) value as %.2f string
+  */
   iin -> string:
     value := registers_.read_u16_le REG_IIN
     iin := (((1.466/LSB)/RSNSI*value)).stringify 3
     debug "iin reg: $value calculates to: $iin A"
     return iin
   
+  /**
+    Returns the VOUT (voltage output) value as %.2f string
+  */
   vout -> string:
     value := registers_.read_u16_le REG_VOUT
     vout := ((VOUTDIV/ADCGAIN) * value).stringify 2
     debug "vout reg: $value calculates to: $vout V"
     return vout
 
+  /**
+    Returns the DIE_TEMP value as %.2f string
+  */
   temp -> string:
     reg := registers_.read_u16_le REG_DIE_TEMP
     temp := (reg * 0.0215/1 - TEMP_OFFSET).stringify 2
     debug "temp reg: $reg calculates to: $temp V"
     return temp
 
+  /**
+    Returns the current config of the LTC4162 as $config.Config object.
+  */
   read_config -> Config:
     value := registers_.read_u8 REG_CONFIG_BITS
     debug "config bits: $value"
@@ -79,11 +100,19 @@ class LTC4162:
     registers_.write_u16_le REG_CONFIG_BITS config.config
     debug "config bits written: $config.config"
 
+  /**
+    Returns the current system status as int. See also $system_status_readable 
+  */
   system_status -> int:
     value := registers_.read_u16_le REG_SYSTEM_STATUS
     debug "system status: " + value.stringify
     return value
-    
+  
+  /**
+    Encodes the given int $sys_stat to its readable string representation which can be looked up in the datasheet.
+    Returns the current charge status as string.
+    Use $system_status to receive the int value of the system_status
+  */
   system_status_readable sys_stat/int:
     status_lst := []
     if (is_bit_set sys_stat 7):
@@ -104,11 +133,19 @@ class LTC4162:
       status_lst.add "en_chg"
     return status_lst
 
+  /**
+    Returns the current charger state as int. See also $charger_state_readable 
+  */
   charger_state -> int:
     value := registers_.read_u16_le REG_CHARGER_STATE
     debug "charger state: $value"
     return value
-    
+  
+  /**
+    Encodes the given int $charger_state to its readable string representation.
+    Returns the current charge status as readable string.
+    Use $charger_state to receive the int value of the charge_status
+  */
   charger_state_readable charger_state/int -> string:
     if charger_state == 1:
       return "Shorted Battery"
