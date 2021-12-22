@@ -5,6 +5,7 @@ import ltc4162
 import config
 import utils
 import system_status
+import telemetry
 
 main:
   bus := i2c.Bus
@@ -25,25 +26,27 @@ main:
   if system_status.is_vin_ovlo: print "LTC4162 is in Protection shut-down"
   if system_status.is_vin_gt_vbat: print "VIN is sufficiently above the battery voltage"
 
+  config := ltc4162.read_config
+  config.enable_force_telemetry_on true
+  ltc4162.write_config config
+
+  telemetry := telemetry.Telemetry ltc4162
   print ""
-  charge_status := ltc4162.charge_status
+  charge_status := telemetry.charge_status
   print "Charge Status: $charge_status"
-  charge_status_readable := ltc4162.charge_status_readable charge_status
+  charge_status_readable := telemetry.charge_status_r
   print "Charge Status: $charge_status_readable"
 
   print ""
-  charger_state := ltc4162.charger_state
+  charger_state := telemetry.charger_state
   print "Charger State: $charger_state"
-  charger_state_readable := ltc4162.charger_state_readable charger_state
+  charger_state_readable := telemetry.charger_state_r
   print "Charger State: $charger_state_readable"
   
   print ""
-  print "VIN:   $ltc4162.vin V"
-  print "IIN:   $ltc4162.iin A"
-  print "VBAT:  $ltc4162.vbat V"
-  print "IBAT:  $ltc4162.ibat A"
-  print "VOUT:  $ltc4162.vout V"
-  print "TEMP:  $ltc4162.temp C°"
-
-  print ""
-  //ltc4162.force_telemetry_on true
+  print "VIN:   $telemetry.vin V"
+  print "IIN:   $telemetry.iin A"
+  print "VBAT:  $telemetry.vbat V"
+  print "IBAT:  $telemetry.ibat A"
+  print "VOUT:  $telemetry.vout V"
+  print "TEMP:  $telemetry.temp C°"
