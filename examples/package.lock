@@ -1,0 +1,9 @@
+# Toit Lock File.
+prefixes:
+  ltc4162: ..
+  config: ..
+  utils: ..
+  system_status: ..
+packages:
+  ..:
+    path: ..
