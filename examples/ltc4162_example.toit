@@ -2,7 +2,7 @@ import serial
 import gpio
 import i2c
 import ltc4162
-import config
+import system_config
 import utils
 import system_status
 import telemetry
@@ -26,9 +26,14 @@ main:
   if system_status.is_vin_ovlo: print "LTC4162 is in Protection shut-down"
   if system_status.is_vin_gt_vbat: print "VIN is sufficiently above the battery voltage"
 
-  config := ltc4162.read_config
-  config.enable_force_telemetry_on true
-  ltc4162.write_config config
+
+  system_config := ltc4162.read_system_config
+  system_config.enable_force_telemetry_on true
+  ltc4162.write_system_config system_config
+
+  charger_config := ltc4162.read_charger_config
+  charger_config.en_c_over_x_term = true
+  ltc4162.write_charger_config charger_config
 
   telemetry := telemetry.Telemetry ltc4162
   print ""
