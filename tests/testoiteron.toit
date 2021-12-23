@@ -1,3 +1,5 @@
+interface TestCase:
+  run -> none
 
 assertEquals expected/any actual/any msg/string="Test OK":
   result := expected == actual
