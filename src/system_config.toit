@@ -1,7 +1,7 @@
 import .utils
 import serial
 
-class Config:
+class SystemConfig:
   static BIT_SUSPEND_CHARGER    ::= 5
   static BIT_RUN_BSR            ::= 4
   static BIT_TELEMETRY_SPEED    ::= 3
