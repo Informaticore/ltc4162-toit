@@ -1,32 +1,26 @@
 import serial
-import .config
+import .system_config
 import .utils
+import .register as reg
+import .charge_settings
+import .charger_config
 
 I2C_ADDRESS ::= 0x68
 
 class LTC4162:
-  static REG_VBAT_ ::= 0x3A
-  static REG_VIN ::= 0x3B
-  static REG_VOUT ::= 0x3C
-  static REG_IBAT ::= 0x3D
-  static REG_IIN ::= 0x3E
-  static REG_SYSTEM_STATUS ::= 0x39
-  static REG_CHARGER_STATE ::= 0x34
-  static REG_CHARGE_STATUS ::= 0x35
-  static REG_CHEM_CELLS ::= 0x43
-  static REG_CONFIG_BITS ::= 0x14
-  static REG_DIE_TEMP ::= 0x3F
 
-  static ADCGAIN ::= 18191.0
+  /**
+  internal span term of 18191 counts per Volt
+  */
+  static INTERNAL_SPAN_TERM ::= 18191.0
+  static AD_GAIN ::= 37.5
   static VINDIV ::= 30.0
   static VBATDIV ::= 3.5
   static RSNSB ::= 0.068
   static RSNSI ::= 0.068
-  static AVPROG ::= 37.5
   static AVCLPROG ::= 37.5
   static VOUTDIV ::= 30.07
   static TEMP_OFFSET ::= 264.4
-  static LSB ::= 10000
 
   registers_/serial.Registers
 
@@ -38,8 +32,9 @@ class LTC4162:
   */
   vbat -> string:
     cell_count := 1
-    value := registers_.read_u16_le REG_VBAT_
-    vbat := (((VBATDIV * cell_count)/ADCGAIN) * value).stringify 4
+    value := registers_.read_u16_le reg.VBAT
+    vbat_span_term := ((VBATDIV * cell_count)/INTERNAL_SPAN_TERM) 
+    vbat := (vbat_span_term * value).stringify 2
     debug "vbat reg: $value calculates to: $vbat"
     return vbat
 
@@ -47,9 +42,9 @@ class LTC4162:
     Returns the IBAT (battery current) value as %.2f string
   */
   ibat -> string:
-    value := registers_.read_u16_le REG_IBAT
+    value := registers_.read_u16_le reg.IBAT
     debug "ibat register value: $value"
-    ad_sensitivity := 1/(ADCGAIN*RSNSB*AVPROG)
+    ad_sensitivity := 1/(INTERNAL_SPAN_TERM*RSNSB*AD_GAIN)
     debug "ad_sensitivity: $ad_sensitivity"
     ibat := (ad_sensitivity * value).stringify 3
     debug "ibat reg: $value calculates to: $ibat A"
@@ -59,8 +54,8 @@ class LTC4162:
     Returns the VIN (voltage input) value as %.2f string
   */
   vin -> string:
-    value := registers_.read_u16_le REG_VIN
-    vin := ((VINDIV/ADCGAIN) * value).stringify 2
+    value := registers_.read_u16_le reg.VIN
+    vin := ((VINDIV/INTERNAL_SPAN_TERM) * value).stringify 2
     debug "vin reg: $value calculates to: $vin"
     return vin
 
@@ -68,9 +63,9 @@ class LTC4162:
     Returns the IIN (input current) value as %.2f string
   */
   iin -> string:
-    value := registers_.read_u16_le REG_IIN
+    value := registers_.read_u16_le reg.IIN
     debug "iin register value: $value"
-    ad_sensitivity := 1/(ADCGAIN*RSNSI*AVPROG)
+    ad_sensitivity := 1/(INTERNAL_SPAN_TERM*RSNSI*AD_GAIN)
     debug "ad_sensitivity: $ad_sensitivity"
     iin := (ad_sensitivity * value).stringify 3
     debug "iin reg: $value calculates to: $iin A"
@@ -80,8 +75,8 @@ class LTC4162:
     Returns the VOUT (voltage output) value as %.2f string
   */
   vout -> string:
-    value := registers_.read_u16_le REG_VOUT
-    vout := ((VOUTDIV/ADCGAIN) * value).stringify 2
+    value := registers_.read_u16_le reg.VOUT
+    vout := ((VOUTDIV/INTERNAL_SPAN_TERM) * value).stringify 2
     debug "vout reg: $value calculates to: $vout V"
     return vout
 
@@ -89,28 +84,28 @@ class LTC4162:
     Returns the DIE_TEMP value as %.2f string
   */
   temp -> string:
-    reg := registers_.read_u16_le REG_DIE_TEMP
+    reg := registers_.read_u16_le reg.DIE_TEMP
     temp := (reg * 0.0215 - TEMP_OFFSET).stringify 2
     debug "temp reg: $reg calculates to: $temp C°"
     return temp
 
   /**
-    Returns the current config of the LTC4162 as $config.Config object.
+    Returns the current config of the LTC4162 as $config.SystemConfig object.
   */
-  read_config -> Config:
-    value := registers_.read_u8 REG_CONFIG_BITS
+  read_system_config -> SystemConfig:
+    value := registers_.read_u8 reg.CONFIG_BITS_REG.REG_VALUE
     debug "config bits: $value"
-    return Config value
+    return SystemConfig value
 
-  write_config config/Config:
-    registers_.write_u16_le REG_CONFIG_BITS config.config
+  write_system_config config/SystemConfig:
+    registers_.write_u16_le reg.CONFIG_BITS_REG.REG_VALUE config.config
     debug "config bits written: $config.config"
 
   /**
     Returns the current system status as int. See also $system_status_readable 
   */
   system_status -> int:
-    value := registers_.read_u16_le REG_SYSTEM_STATUS
+    value := registers_.read_u16_le reg.SYSTEM_STATUS
     debug "system status: " + value.stringify
     return value
   
@@ -143,7 +138,7 @@ class LTC4162:
     Returns the current charger state as int. See also $charger_state_readable 
   */
   charger_state -> int:
-    value := registers_.read_u16_le REG_CHARGER_STATE
+    value := registers_.read_u16_le reg.CHARGER_STATE
     debug "charger state: $value"
     return value
   
@@ -182,10 +177,41 @@ class LTC4162:
     Returns the current charge status as int. See also $charge_status_readable 
   */
   charge_status -> int:
-    value := registers_.read_u16_le REG_CHARGE_STATUS
+    value := registers_.read_u16_le reg.CHARGE_STATUS
     debug "charge status: " + value.stringify
     return value
+
+  read_v_charge_settings -> ChargeSettings:
+    jeita_6_5 := registers_.read_u16_le reg.CHARGE.VCHARGE_JEITA_6_5_REG
+    jeite_4_3_2 := registers_.read_u16_le reg.CHARGE.VCHARGE_JEITA_4_3_2_REG
+    return ChargeSettings jeita_6_5 jeite_4_3_2
   
+  write_v_charge_settings charge_settings/ChargeSettings:
+    registers_.write_u16_le reg.CHARGE.VCHARGE_JEITA_6_5_REG charge_settings.get_jeiter_6_5
+    registers_.write_u16_le reg.CHARGE.VCHARGE_JEITA_4_3_2_REG charge_settings.get_jeiter_4_3_2
+
+  read_i_charge_settings -> ChargeSettings:
+    jeita_6_5 := registers_.read_u16_le reg.CHARGE.ICHARGE_JEITA_6_5_REG
+    jeite_4_3_2 := registers_.read_u16_le reg.CHARGE.ICHARGE_JEITA_4_3_2_REG
+    return ChargeSettings jeita_6_5 jeite_4_3_2
+  
+  write_i_charge_settings charge_settings/ChargeSettings:
+    registers_.write_u16_le reg.CHARGE.ICHARGE_JEITA_6_5_REG charge_settings.get_jeiter_6_5
+    registers_.write_u16_le reg.CHARGE.ICHARGE_JEITA_4_3_2_REG charge_settings.get_jeiter_4_3_2
+  
+  /**
+    Returns a list containing config for en_c_over_x_term [0] and en_jeita [1]
+  */
+  read_charger_config -> ChargerConfig:
+    value := registers_.read_u8 reg.CHARGER_CONFIG_BITS.REG_VALUE
+    return ChargerConfig value
+
+  /**
+    Writes charger config for en_c_over_x_term and en_jeita to the register
+  */
+  write_charger_config charger_config/ChargerConfig:
+    registers_.write_u8 reg.CHARGER_CONFIG_BITS.REG_VALUE charger_config.get_charger_config
+
   /**
     Encodes the given int $charge_status to its readable string representation.
     Returns the current charge status as readable string.
