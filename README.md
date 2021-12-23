@@ -2,7 +2,7 @@
 Library to control a LTC4162 Charger IC with toitlang
 
 ## Getting Started
-
+Create ltc-device
 ```
   bus := i2c.Bus
       --sda=gpio.Pin 21
@@ -11,5 +11,9 @@ Library to control a LTC4162 Charger IC with toitlang
   device := bus.device ltc4162.I2C_ADDRESS
   ltc4162_ := ltc4162.LTC4162 device
 ```
-First you create the i2c.Bus with the i2c pin. With this bus you can create the i2c device and finaly using this device to generate the LTC4162 object.
 
+## Run tests
+To run all tests you can use
+```
+toit run --no-device run_all.toit
+```
