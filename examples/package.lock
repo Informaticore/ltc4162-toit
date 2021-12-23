@@ -1,7 +1,7 @@
 # Toit Lock File.
 prefixes:
   ltc4162: ..
-  config: ..
+  system_config: ..
   utils: ..
   system_status: ..
   telemetry: ..

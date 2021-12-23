@@ -1,7 +1,9 @@
 prefixes:
   test_utils: ..
   utils: ..
-  config: ..
+  system_config: ..
+  charger_config: ..
+  charge_settings: ..
 packages:
   ..:
     path: ..
