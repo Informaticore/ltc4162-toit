@@ -15,5 +15,5 @@ Create ltc-device
 ## Run tests
 To run all tests you can use
 ```
-toit run --no-device run_all.toit
+toit run --no-device tests/run_all.toit
 ```
