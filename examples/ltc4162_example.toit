@@ -15,21 +15,26 @@ main:
   device := bus.device ltc4162.I2C_ADDRESS
   ltc4162 := ltc4162.LTC4162 device
 
+  // Read system status and print all enabled ones
   system_status := ltc4162.read_system_status
   status_list := system_status.get_status_as_string_list
   print "System Status:"
   status_list.do: | item |
     print " -> $item" 
 
-  
+  // Read system config from the device and enables force_telementry_on to be enabled and
+  // also enabled the MPPT algorithm and writes the config back to the device
   system_config := ltc4162.read_system_config
   system_config.enable_force_telemetry_on true
+  system_config.enable_mppt_on true
   ltc4162.write_system_config system_config
 
+  // Read the charger config and enables C/x termination once the battery reaches constant voltage
   charger_config := ltc4162.read_charger_config
   charger_config.en_c_over_x_term = true
   ltc4162.write_charger_config charger_config
 
+  // Read all telemetry relevant registers and prints them to the terminal
   telemetry := telemetry.Telemetry ltc4162
   print ""
   charge_status := telemetry.charge_status
