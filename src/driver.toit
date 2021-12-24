@@ -203,14 +203,14 @@ class LTC4162:
     Returns a list containing config for en_c_over_x_term [0] and en_jeita [1]
   */
   read_charger_config -> ChargerConfig:
-    value := registers_.read_u8 reg.CHARGER_CONFIG_BITS.REG_VALUE
+    value := registers_.read_u16_le reg.CHARGER_CONFIG_BITS.REG_VALUE
     return ChargerConfig value
 
   /**
     Writes charger config for en_c_over_x_term and en_jeita to the register
   */
   write_charger_config charger_config/ChargerConfig:
-    registers_.write_u8 reg.CHARGER_CONFIG_BITS.REG_VALUE charger_config.get_charger_config
+    registers_.write_u16_le reg.CHARGER_CONFIG_BITS.REG_VALUE charger_config.get_charger_config
 
   /**
     Encodes the given int $charge_status to its readable string representation.
