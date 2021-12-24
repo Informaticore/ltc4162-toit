@@ -1,3 +1,10 @@
+/**
+  This file contains all register addresses which are available on the LTC4162. 
+  Some registers have multiple which are also reflected in extra register classes
+  with dedicated bit values. Also ranges of values are reflected in the form of FROM_BIT and TO_BIT
+  which can be used with the utils methode read_bits
+*/
+
 VBAT_LO_ALERT_LIMIT                 ::= 0x01
 VBAT_HI_ALERT_LIMIT                 ::= 0x02
 VIN_LO_ALERT_LIMIT                  ::= 0x03
@@ -39,7 +46,15 @@ SYSTEM_STATUS                       ::= 0x39
 CHEM_CELLS                          ::= 0x43
 CONFIG_BITS                         ::= 0x14
 DIE_TEMP                            ::= 0x3F
-
+THERMISTOR_VOLTAGE                  ::= 0x40
+BSR                                 ::= 0x41
+JEITA_REGION                        ::= 0x42
+ICHARGE_DAC                         ::= 0x44
+VCHARGE_DAC                         ::= 0x45
+IIN_LIMIT_DAC                       ::= 0x46
+VBAT_FILT                           ::= 0x47
+BSR_CHARGE_CURRENT                  ::= 0x48
+INPUT_UNDERVOLTAGE_DAC              ::= 0x4B
 
 
 class EN_LIMIT_ALERTS_REG:
@@ -125,3 +140,17 @@ class CHARGER_CONFIG_BITS:
 class LIMIT_ALERTS_REG:
   static REG_VALUE ::= 0x36
 
+class CHEM_CELLS_REG:
+  static REG_VALUE ::= 0x43
+
+  static CHEM_FROM_BIT        ::= 11
+  static CHEM_TO_BIT          ::= 8
+
+  static CELL_COUNT_FROM_BIT  ::= 3
+  static CELL_COUNT_TO_BIT    ::= 0
+
+class TELEMETRY_STATUS_REG:
+  static REG_VALUE ::= 0x4A
+
+  static BSR_QUESTIONABLE_BIT ::= 1
+  static TELEMETRY_VALID      ::= 0 
