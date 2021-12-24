@@ -22,8 +22,8 @@ class Telemetry:
     iin = ltc4162.iin 
     vout = ltc4162.vout 
     temp = ltc4162.temp 
-    system_status = ltc4162.system_status 
-    system_status_r = ltc4162.system_status_readable system_status
+    system_status = ltc4162.read_system_status
+    system_status_r = system_status.get_status_as_string_list
     charge_status = ltc4162.charge_status 
     charge_status_r = ltc4162.charge_status_readable charge_status
     charger_state = ltc4162.charger_state
@@ -37,7 +37,6 @@ class Telemetry:
         "iin": iin,
         "vout": vout,
         "temp": temp,
-        "sys_status": system_status,
         "sys_status_r": system_status_r,
         "charger_state": charger_state,
         "charger_state_r": charger_state_r,

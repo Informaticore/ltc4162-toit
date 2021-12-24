@@ -65,3 +65,15 @@ class SystemStatus:
   */
   is_en_chg -> bool:
     return is_bit_set system_status BIT_EN_CHG
+
+  get_status_as_string_list -> List:
+    list := []
+    if is_en_chg: list.add "Battery Charger Enabled"
+    if is_cell_count_err: list.add "Cell count error detected"
+    if is_intvcc_gt_2p8v: list.add "INTVCC voltage is greater then 2.8V"
+    if is_vin_gt_4p2v: list.add "VIN is greater then 4.2V"
+    if is_no_rt: list.add "No frequency setting resistor is detected on the RT pin"
+    if is_thermal_shutdown: list.add "LTC4162 is in thermal shutdown protection due to an excessively high die temperature (typically 150°C)"
+    if is_vin_ovlo: list.add "LTC4162 is in Protection shut-down"
+    if is_vin_gt_vbat: list.add "VIN is sufficiently above the battery voltage"
+    return list

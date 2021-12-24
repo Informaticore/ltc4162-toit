@@ -1,5 +1,6 @@
 import serial
 import .system_config
+import .system_status
 import .utils
 import .register as reg
 import .charge_settings
@@ -104,36 +105,12 @@ class LTC4162:
   /**
     Returns the current system status as int. See also $system_status_readable 
   */
-  system_status -> int:
+  read_system_status -> SystemStatus:
     value := registers_.read_u16_le reg.SYSTEM_STATUS
-    debug "system status: " + value.stringify
-    return value
+    system_status := SystemStatus value
+    debug "system status: $value" + value.stringify
+    return system_status
   
-  /**
-    Encodes the given int $sys_stat to its readable string representation which can be looked up in the datasheet.
-    Returns the current charge status as string.
-    Use $system_status to receive the int value of the system_status
-  */
-  system_status_readable sys_stat/int:
-    status_lst := []
-    if (is_bit_set sys_stat 7):
-      status_lst.add "intvcc_gt_2p8v"
-    if (is_bit_set sys_stat 6):
-      status_lst.add "vin_gt_4p2v"
-    if (is_bit_set sys_stat 5):
-      status_lst.add "vin_gt_vbat"
-    if (is_bit_set sys_stat 4):
-      status_lst.add "vin_ovlo: Input voltage shutdown protection is active: Input voltage above 38.6V"
-    if (is_bit_set sys_stat 3):
-      status_lst.add "thermal_shutdown"
-    if (is_bit_set sys_stat 2):
-      status_lst.add "no_rt"
-    if (is_bit_set sys_stat 1):
-      status_lst.add "cell_count_err"
-    if (is_bit_set sys_stat 0):
-      status_lst.add "en_chg"
-    return status_lst
-
   /**
     Returns the current charger state as int. See also $charger_state_readable 
   */
