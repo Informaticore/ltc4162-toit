@@ -5,6 +5,8 @@ import .utils
 import .register
 import .charge_settings
 import .charger_config
+import .charger_state
+import .charge_status
 
 I2C_ADDRESS ::= 0x68
 
@@ -120,8 +122,8 @@ class LTC4162:
     Writes the given $system_config to the LTC4162
   */
   write_system_config system_config/SystemConfig:
-    write CONFIG_BITS_REG.REG_VALUE system_config.config
-    debug "config bits written: $system_config.config"
+    write CONFIG_BITS_REG.REG_VALUE system_config.system_config
+    debug "config bits written: $system_config.system_config"
 
   /**
     Returns the current system status as int. 
@@ -129,55 +131,16 @@ class LTC4162:
   read_system_status -> SystemStatus:
     value := read SYSTEM_STATUS
     system_status := SystemStatus value
-    debug "system status: $value" + value.stringify
+    debug "system status: $value"
     return system_status
   
   /**
-    Returns the current charger state as int. See also $charger_state_readable 
+    Returns the current charger state as $ChargerState.
   */
-  charger_state -> int:
+  read_charger_state -> ChargerState:
     value := read CHARGER_STATE
     debug "charger state: $value"
-    return value
-  
-  /**
-    Encodes the given int $charger_state to its readable string representation.
-    Returns the current charge status as readable string.
-    Use $charger_state to receive the int value of the charge_status
-  */
-  charger_state_readable charger_state/int -> string:
-    if charger_state == 1:
-      return "Shorted Battery"
-    else if charger_state == 2:
-      return "Battery Missing"
-    else if charger_state == 4:
-      return "Max charge time reached"
-    else if charger_state == 8:
-      return "c over x term?!"
-    else if charger_state == 16:
-      return "Timer term?"
-    else if charger_state == 32:
-      return "NTC pause"
-    else if charger_state == 64:
-      return "Constant current / Constant Voltage charging phase"
-    else if charger_state == 128:
-      return "precharge phase"
-    else if charger_state == 256:
-      return "Suspended/Pending"
-    else if charger_state == 2048:
-      return "Thermal Regulation"
-    else if charger_state == 4096:
-      return "Bat Detect Failed"
-    else:
-      return "None"
-
-  /**
-    Returns the current charge status as int. See also $charge_status_readable 
-  */
-  charge_status -> int:
-    value := read CHARGE_STATUS
-    debug "charge status: " + value.stringify
-    return value
+    return ChargerState value
 
   /**
     Returns $ChargeSettings of the VChargeSettings from the LTC4162 device
@@ -223,24 +186,9 @@ class LTC4162:
     write CHARGER_CONFIG_BITS.REG_VALUE charger_config.get_charger_config
 
   /**
-    Encodes the given int $charge_status to its readable string representation.
-    Returns the current charge status as readable string.
-    Use $charge_status to receive the int value of the charge_status
+    Returns the current charge status as $ChargeStatus.
   */
-  charge_status_readable charge_status/int -> string:
-    if charge_status == 0:
-      return "Charging OFF"
-    else if charge_status == 1:
-      return "Constant Voltage"
-    else if charge_status == 2:
-      return "Constant Current"
-    else if charge_status == 4:
-      return "Input Current Crontrol active"
-    else if charge_status == 8:
-      return "Undervoltage Protection active"
-    else if charge_status == 16:
-      return "Thermal Regulation active"
-    else if charge_status == 32:
-      return "Dropout"
-    else:
-      return "None"
+  read_charge_status -> ChargeStatus:
+    value := read CHARGE_STATUS
+    debug "charge status: $value"
+    return ChargeStatus value

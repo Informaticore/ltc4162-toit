@@ -8,10 +8,10 @@ class SystemConfig:
   static BIT_FORCE_TELEMETRY_ON ::= 2
   static BIT_MPPT_ENABLED       ::= 1
 
-  config/int := 0
+  system_config/int := 0
 
   constructor config_value/int:
-    config = config_value
+    system_config = config_value
 
   enable_suspend_charger enable/bool:
     set_bit_ BIT_SUSPEND_CHARGER enable
@@ -30,21 +30,21 @@ class SystemConfig:
 
   set_bit_ bit/int enable/bool:
     if enable:
-      config = enable_bit config bit
+      system_config = enable_bit system_config bit
     else:
-      config = disable_bit config bit
+      system_config = disable_bit system_config bit
 
   is_suspend_charger_enabled -> bool:
-    return is_bit_set config BIT_SUSPEND_CHARGER
+    return is_bit_set system_config BIT_SUSPEND_CHARGER
 
   is_run_bsr_enabled -> bool:
-    return (is_bit_set config BIT_RUN_BSR)
+    return (is_bit_set system_config BIT_RUN_BSR)
 
   is_telemetry_speed_enabled -> bool:
-    return (is_bit_set config BIT_TELEMETRY_SPEED)
+    return (is_bit_set system_config BIT_TELEMETRY_SPEED)
 
   is_force_telemetry_on_enabled -> bool:
-    return (is_bit_set config BIT_FORCE_TELEMETRY_ON)
+    return (is_bit_set system_config BIT_FORCE_TELEMETRY_ON)
 
   is_mppt_on_enabled -> bool:
-    return (is_bit_set config BIT_MPPT_ENABLED)
+    return (is_bit_set system_config BIT_MPPT_ENABLED)
