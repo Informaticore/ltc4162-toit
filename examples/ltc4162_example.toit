@@ -5,7 +5,10 @@ import ltc4162
 import system_config
 import utils
 import system_status
-import telemetry
+import register
+import pubsub
+
+topic ::= "cloud:telemetry"
 
 main:
   bus := i2c.Bus
@@ -17,6 +20,7 @@ main:
 
   // Read system status and print all enabled ones
   system_status := ltc4162.read_system_status
+  print system_status.system_status
   status_list := system_status.get_status_as_string_list
   print "System Status:"
   status_list.do: | item |
@@ -34,24 +38,36 @@ main:
   charger_config.en_c_over_x_term = true
   ltc4162.write_charger_config charger_config
 
-  // Read all telemetry relevant registers and prints them to the terminal
-  telemetry := telemetry.Telemetry ltc4162
-  print ""
-  charge_status := telemetry.charge_status
-  print "Charge Status: $charge_status"
-  charge_status_readable := telemetry.charge_status_r
-  print "Charge Status: $charge_status_readable"
+  charge_status := ltc4162.read_charge_status
+  print "Charge Status: $charge_status.charge_status_readable"
 
-  print ""
-  charger_state := telemetry.charger_state
-  print "Charger State: $charger_state"
-  charger_state_readable := telemetry.charger_state_r
-  print "Charger State: $charger_state_readable"
+  // Read all telemetry relevant registers and prints them to the terminal
+  charger_state := ltc4162.read_charger_state
+  print "Charger State: $charger_state.charger_state_readable"
   
-  print ""
-  print "VIN:   $telemetry.vin V"
-  print "IIN:   $telemetry.iin A"
-  print "VBAT:  $telemetry.vbat V"
-  print "IBAT:  $telemetry.ibat A"
-  print "VOUT:  $telemetry.vout V"
-  print "TEMP:  $telemetry.temp C°"
+  payload := ""
+  payload += "Status: $charge_status.charge_status_readable\n"
+  payload += "Status value: $charge_status.charge_status\n"
+  payload += "VIN:   $ltc4162.vin V\n"
+  payload += "IIN:   $ltc4162.iin A\n"
+  payload += "VBAT:  $ltc4162.vbat V\n"
+  payload += "IBAT:  $ltc4162.ibat A\n"
+  payload += "VOUT:  $ltc4162.vout V\n"
+  payload += "TEMP:  $ltc4162.temp C°\n"
+  print payload
+
+  chem_cells := ltc4162.read register.CHEM_CELLS_REG.REG_VALUE
+  cell_count := utils.read_bits chem_cells register.CHEM_CELLS_REG.CELL_COUNT_FROM_BIT register.CHEM_CELLS_REG.CELL_COUNT_TO_BIT
+  //print cell_count
+
+  json := {
+    "charger": charge_status.charge_status_readable,
+    "vin": ltc4162.vin,
+    "iin": ltc4162.iin,
+    "vbat": ltc4162.vbat,
+    "ibat": ltc4162.ibat,
+    "vout": ltc4162.vout,
+    "temp": ltc4162.temp
+  }
+
+  //pubsub.publish topic charge_status.charge_status_readable

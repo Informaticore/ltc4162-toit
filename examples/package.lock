@@ -5,6 +5,7 @@ prefixes:
   utils: ..
   system_status: ..
   telemetry: ..
+  register: ..
 packages:
   ..:
     path: ..

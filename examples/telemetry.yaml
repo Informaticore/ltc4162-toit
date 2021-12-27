@@ -1,0 +1,4 @@
+name: "Telemetry"
+entrypoint: ltc4162_example.toit
+triggers:
+  on_interval: 5s
