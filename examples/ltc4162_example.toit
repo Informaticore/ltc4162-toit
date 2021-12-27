@@ -56,6 +56,7 @@ main:
   payload += "TEMP:  $ltc4162.temp C°\n"
   print payload
 
+  //some functions are not yet implemented with the ltc-driver but you can read registers as follows
   chem_cells := ltc4162.read register.CHEM_CELLS_REG.REG_VALUE
   cell_count := utils.read_bits chem_cells register.CHEM_CELLS_REG.CELL_COUNT_FROM_BIT register.CHEM_CELLS_REG.CELL_COUNT_TO_BIT
   //print cell_count
