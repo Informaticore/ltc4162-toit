@@ -12,6 +12,9 @@ Create ltc-device
   ltc4162_ := ltc4162.LTC4162 device
 ```
 
+Check out the example for more code.
+
+
 ## Run tests
 To run all tests you can use
 ```
